@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('wallet_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->nullable()->constrained()->nullOnDelete();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('wallet_id')->constrained()->onDelete('cascade');
+            $table->foreignUuid('category_id')->nullable()->constrained()->nullOnDelete();
             $table->enum('type', ['income', 'expense', 'transfer']);
             $table->decimal('amount', 15, 2);
             $table->string('note')->nullable();
