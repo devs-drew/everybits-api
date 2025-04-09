@@ -56,9 +56,7 @@ class WalletService
     public function createWallet(array $data): Wallet|JsonResponse
     {
         try {
-            return Wallet::create(array_merge($data, [
-                'user_id' => $this->user->id, // Replace with actual authenticated user ID
-            ]));
+            return $this->user->wallets()->create($data);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to create wallet'], 500);
         }
@@ -111,7 +109,7 @@ class WalletService
     public function findWallet(string $id): Wallet|JsonResponse
     {
         try {
-            return Wallet::findOrFail($id);
+            return $this->user->wallets()->findOrFail($id);
         } catch (ModelNotFoundException $e) {
             throw new NotFoundHttpException("Wallet not found");
         }

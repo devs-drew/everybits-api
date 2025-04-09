@@ -10,6 +10,7 @@ use App\Models\Wallet;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Auth;
 
 class WalletController extends Controller
 {
@@ -22,7 +23,7 @@ class WalletController extends Controller
      */
     public function __construct()
     {
-        $this->walletService = new WalletService(User::first()); // Replace with actual authenticated user
+        $this->walletService = new WalletService(Auth::user());
     }
 
     /**
