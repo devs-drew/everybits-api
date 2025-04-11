@@ -17,9 +17,9 @@ class WalletController extends Controller
     public User $user;
 
     /**
-     * WalletController constructor.
+     * Create a new controller instance.
      *
-     * @param WalletService $walletService
+     * @return void
      */
     public function __construct()
     {
@@ -39,8 +39,8 @@ class WalletController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  $wallet
-     * @return JsonResponse
+     * @param Wallet $wallet
+     * @return WalletResource
      */
     public function show(Wallet $wallet): WalletResource
     {
@@ -50,8 +50,8 @@ class WalletController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  StoreWalletRequest $request
-     * @return JsonResponse
+     * @param StoreWalletRequest $request
+     * @return WalletResource
      */
     public function store(StoreWalletRequest $request): WalletResource
     {
@@ -62,9 +62,9 @@ class WalletController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  UpdateWalletRequest $request
-     * @param  Wallet $wallet
-     * @return JsonResponse
+     * @param UpdateWalletRequest $request
+     * @param Wallet $wallet
+     * @return WalletResource
      */
     public function update(UpdateWalletRequest $request, Wallet $wallet): WalletResource
     {
@@ -77,7 +77,7 @@ class WalletController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Wallet $wallet
+     * @param Wallet $wallet
      * @return JsonResponse
      */
     public function destroy(Wallet $wallet): JsonResponse
