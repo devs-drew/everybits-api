@@ -7,14 +7,14 @@ use App\Http\Requests\UpdateWalletRequest;
 use App\Http\Resources\WalletResource;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class WalletController extends Controller
 {
-    public WalletService $walletService;
+    public User $user;
 
     /**
      * WalletController constructor.
@@ -23,7 +23,7 @@ class WalletController extends Controller
      */
     public function __construct()
     {
-        $this->walletService = new WalletService(Auth::user());
+        $this->user = Auth::user();
     }
 
     /**
@@ -33,29 +33,29 @@ class WalletController extends Controller
      */
     public function index(): ResourceCollection
     {
-        return WalletResource::collection($this->walletService->getWallets());
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  StoreWalletRequest $request
-     * @return JsonResponse|WalletResource
-     */
-    public function store(StoreWalletRequest $request): WalletResource|JsonResponse
-    {
-        return new WalletResource($this->walletService->createWallet($request->validated()));
+        return WalletResource::collection($this->user->wallets()->get());
     }
 
     /**
      * Display the specified resource.
      *
      * @param  $wallet
-     * @return JsonResponse|WalletResource
+     * @return JsonResponse
      */
-    public function show(string $wallet): WalletResource|JsonResponse
+    public function show(Wallet $wallet): WalletResource
     {
-        $wallet = $this->walletService->getWalletById($wallet);
+        return new WalletResource($this->user->wallets()->findOrFail($wallet->id));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  StoreWalletRequest $request
+     * @return JsonResponse
+     */
+    public function store(StoreWalletRequest $request): WalletResource
+    {
+        $wallet = $this->user->wallets()->create($request->validated());
         return new WalletResource($wallet);
     }
 
@@ -64,11 +64,14 @@ class WalletController extends Controller
      *
      * @param  UpdateWalletRequest $request
      * @param  Wallet $wallet
-     * @return JsonResponse|WalletResource
+     * @return JsonResponse
      */
-    public function update(UpdateWalletRequest $request, string $wallet): WalletResource|JsonResponse
+    public function update(UpdateWalletRequest $request, Wallet $wallet): WalletResource
     {
-        return new WalletResource($this->walletService->updateWallet($wallet, $request->validated()));
+        Gate::authorize('modify', $wallet);
+        $wallet = $this->user->wallets()->findOrFail($wallet->id);
+        $wallet->update($request->validated());
+        return new WalletResource($wallet);
     }
 
     /**
@@ -77,8 +80,13 @@ class WalletController extends Controller
      * @param  Wallet $wallet
      * @return JsonResponse
      */
-    public function destroy(string $wallet): JsonResponse
+    public function destroy(Wallet $wallet): JsonResponse
     {
-        return $this->walletService->deleteWallet($wallet);
+        Gate::authorize('modify', $wallet);
+        $wallet = $this->user->wallets()->findOrFail($wallet->id);
+        $wallet->delete();
+        return response()->json([
+            'message' => 'Wallet deleted successfully'
+        ]);
     }
 }
